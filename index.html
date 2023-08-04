@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <script
+      src="https://code.jquery.com/jquery-2.2.4.min.js"
+      integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700italic,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <title>Scratch Card</title>
+    <style type="text/css">
+      html {
+        box-sizing: border-box;
+      }
+
+      *,
+      *:before,
+      *:after {
+        box-sizing: inherit;
+      }
+
+      .scratchpad {
+        width: 450px;
+        height: 445px;
+        border: solid 10px #27cf27;
+        margin: 0 auto;
+      }
+
+      body {
+        background-image: url("https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg");
+      }
+
+      .scratch-container {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        width: 100%;
+      }
+
+      @media only screen and (max-width: 480px) {
+        .scratchpad {
+          width: 400px;
+          height: 396px;
+        }
+        .scratch-container {
+          width: 400px !important;
+        }
+      }
+
+      /* Custom, iPhone Retina */
+
+      @media only screen and (max-width: 320px) {
+        .scratchpad {
+          width: 558px;
+          height: 800px;
+        }
+        .scratch-container {
+          width: 290px !important;
+        }
+      }
+
+      .promo-container {
+        background: #fff;
+        border-radius: 5px;
+        -moz-border-radius: 5px;
+        -webkit-border-radius: 5px;
+        width: 450px;
+        padding: 20px;
+        margin: 0 auto;
+        text-align: center;
+        font-family: "Open Sans", Arial, Sans-serif;
+        color: #333;
+        font-size: 16px;
+        margin-top: 20px;
+      }
+
+      .btn {
+        background: #56cfd2;
+        color: #fff;
+        padding: 10px 25px;
+        display: inline-block;
+        margin-top: 15px;
+        text-decoration: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        border-radius: 3px;
+        -moz-border-radius: 3px;
+        -webkit-border-radiuss: 3px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="scratch-container">
+      <div id="promo" class="scratchpad"></div>
+    </div>
+    <div class="promo-container" style="display: none">
+      <div class="promo-code"></div>
+      <a href="https://www.google.com/" target="_blank" class="btn">Return</a>
+    </div>
+
+    <script type="text/javascript">
+      (function (a) {
+        "use strict";
+
+        function b(c, d) {
+          (this.$el = a(c)),
+            (this.options = d),
+            (this.init = !1),
+            (this.enabled = !0),
+            this._generate();
+        }
+        (b.prototype = {
+          _generate: function () {
+            return a.support.canvas
+              ? void ((this.canvas = document.createElement("canvas")),
+                (this.ctx = this.canvas.getContext("2d")),
+                "static" === this.$el.css("position") &&
+                  this.$el.css("position", "relative"),
+                (this.$img = a('<img src=""/>').attr("crossOrigin", "").css({
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                })),
+                (this.$scratchpad = a(this.canvas).css({
+                  position: "absolute",
+                  width: "100%",
+                  height: "100%",
+                })),
+                this.$scratchpad.bindMobileEvents(),
+                this.$scratchpad
+                  .mousedown(
+                    a.proxy(function (c) {
+                      return (
+                        !this.enabled ||
+                        void ((this.canvasOffset = a(this.canvas).offset()),
+                        (this.scratch = !0),
+                        this._scratchFunc(c, "Down"))
+                      );
+                    }, this)
+                  )
+                  .mousemove(
+                    a.proxy(function (c) {
+                      this.scratch && this._scratchFunc(c, "Move");
+                    }, this)
+                  )
+                  .mouseup(
+                    a.proxy(function (c) {
+                      this.scratch &&
+                        ((this.scratch = !1), this._scratchFunc(c, "Up"));
+                    }, this)
+                  ),
+                this._setOptions(),
+                this.$el.append(this.$img).append(this.$scratchpad),
+                (this.init = !0),
+                this.reset())
+              : (this.$el.append("Canvas is not supported in this browser."),
+                !0);
+          },
+          reset: function () {
+            var c = this,
+              d = Math.ceil(this.$el.innerWidth()),
+              f = Math.ceil(this.$el.innerHeight()),
+              g = window.devicePixelRatio || 1;
+            (this.pixels = d * f),
+              this.$scratchpad.attr("width", d).attr("height", f),
+              this.canvas.setAttribute("width", d * g),
+              this.canvas.setAttribute("height", f * g),
+              this.ctx.scale(g, g),
+              (this.pixels = d * g * f * g),
+              this.$img.hide(),
+              this.options.bg &&
+                ("#" === this.options.bg.charAt(0)
+                  ? this.$el.css("backgroundColor", this.options.bg)
+                  : (this.$el.css("backgroundColor", ""),
+                    this.$img.attr("src", this.options.bg))),
+              this.options.fg &&
+                ("#" === this.options.fg.charAt(0)
+                  ? ((this.ctx.fillStyle = this.options.fg),
+                    this.ctx.beginPath(),
+                    this.ctx.rect(0, 0, d, f),
+                    this.ctx.fill(),
+                    this.$img.show())
+                  : a(new Image())
+                      .attr("crossOrigin", "")
+                      .attr("src", this.options.fg)
+                      .load(function () {
+                        c.ctx.drawImage(this, 0, 0, d, f), c.$img.show();
+                      }));
+          },
+          clear: function () {
+            this.ctx.clearRect(
+              0,
+              0,
+              Math.ceil(this.$el.innerWidth()),
+              Math.ceil(this.$el.innerHeight())
+            );
+          },
+          enable: function (c) {
+            this.enabled = !(!0 !== c);
+          },
+          destroy: function () {
+            this.$el.children().remove(), a.removeData(this.$el, "wScratchPad");
+          },
+          _setOptions: function () {
+            var c, d;
+            for (c in this.options)
+              (this.options[c] = this.$el.attr("data-" + c) || this.options[c]),
+                (d = "set" + c.charAt(0).toUpperCase() + c.substring(1)),
+                this[d] && this[d](this.options[c]);
+          },
+          setBg: function () {
+            this.init && this.reset();
+          },
+          setFg: function () {
+            this.setBg();
+          },
+          setCursor: function (c) {
+            this.$el.css("cursor", c);
+          },
+          _scratchFunc: function (c, d) {
+            (c.pageX = Math.floor(c.pageX - this.canvasOffset.left)),
+              (c.pageY = Math.floor(c.pageY - this.canvasOffset.top)),
+              this["_scratch" + d](c),
+              (this.options.realtime || "Up" === d) &&
+                this.options["scratch" + d] &&
+                this.options["scratch" + d].apply(this, [
+                  c,
+                  this._scratchPercent(),
+                ]);
+          },
+          _scratchPercent: function () {
+            for (
+              var c = 0,
+                d = this.ctx.getImageData(
+                  0,
+                  0,
+                  this.canvas.width,
+                  this.canvas.height
+                ),
+                f = 0,
+                g = d.data.length;
+              f < g;
+              f += 4
+            )
+              0 === d.data[f] &&
+                0 === d.data[f + 1] &&
+                0 === d.data[f + 2] &&
+                0 === d.data[f + 3] &&
+                c++;
+            return 100 * (c / this.pixels);
+          },
+          _scratchDown: function (c) {
+            (this.ctx.globalCompositeOperation = "destination-out"),
+              (this.ctx.lineJoin = "round"),
+              (this.ctx.lineCap = "round"),
+              (this.ctx.strokeStyle = this.options.color),
+              (this.ctx.lineWidth = this.options.size),
+              this.ctx.beginPath(),
+              this.ctx.arc(
+                c.pageX,
+                c.pageY,
+                this.options.size / 2,
+                0,
+                2 * Math.PI,
+                !0
+              ),
+              this.ctx.closePath(),
+              this.ctx.fill(),
+              this.ctx.beginPath(),
+              this.ctx.moveTo(c.pageX, c.pageY);
+          },
+          _scratchMove: function (c) {
+            this.ctx.lineTo(c.pageX, c.pageY), this.ctx.stroke();
+          },
+          _scratchUp: function () {
+            this.ctx.closePath();
+          },
+        }),
+          (a.support.canvas = document.createElement("canvas").getContext),
+          (a.fn.wScratchPad = function (c, d) {
+            if ("string" == typeof c) {
+              var g,
+                h = [],
+                j =
+                  (void 0 === d ? "get" : "set") +
+                  c.charAt(0).toUpperCase() +
+                  c.substring(1),
+                k = function () {
+                  g.options[c] && (g.options[c] = d),
+                    g[j] && g[j].apply(g, [d]);
+                },
+                l = function () {
+                  return g[j]
+                    ? g[j].apply(g, [d])
+                    : g.options[c]
+                    ? g.options[c]
+                    : void 0;
+                },
+                m = function () {
+                  (g = a.data(this, "wScratchPad")),
+                    g &&
+                      (g[c]
+                        ? g[c].apply(g, [d])
+                        : void 0 === d
+                        ? h.push(l())
+                        : k());
+                };
+              return (
+                this.each(m), h.length ? (1 === h.length ? h[0] : h) : this
+              );
+            }
+            return (
+              (c = a.extend({}, a.fn.wScratchPad.defaults, c)),
+              this.each(function () {
+                var n = a.data(this, "wScratchPad");
+                return (
+                  n ||
+                    ((n = new b(this, a.extend(!0, {}, c))),
+                    a.data(this, "wScratchPad", n)),
+                  n
+                );
+              })
+            );
+          }),
+          (a.fn.wScratchPad.defaults = {
+            size: 5,
+            bg: "#cacaca",
+            fg: "#6699ff",
+            realtime: !0,
+            scratchDown: null,
+            scratchUp: null,
+            scratchMove: null,
+            cursor: "crosshair",
+          }),
+          (a.fn.bindMobileEvents = function () {
+            a(this).on(
+              "touchstart touchmove touchend touchcancel",
+              function (c) {
+                var d = c.changedTouches || c.originalEvent.targetTouches,
+                  f = d[0],
+                  g = "";
+                switch (c.type) {
+                  case "touchstart":
+                    g = "mousedown";
+                    break;
+                  case "touchmove":
+                    (g = "mousemove"), c.preventDefault();
+                    break;
+                  case "touchend":
+                    g = "mouseup";
+                    break;
+                  default:
+                    return;
+                }
+                var h = document.createEvent("MouseEvent");
+                h.initMouseEvent(
+                  g,
+                  !0,
+                  !0,
+                  window,
+                  1,
+                  f.screenX,
+                  f.screenY,
+                  f.clientX,
+                  f.clientY,
+                  !1,
+                  !1,
+                  !1,
+                  !1,
+                  0,
+                  null
+                ),
+                  f.target.dispatchEvent(h);
+              }
+            );
+          });
+      })(jQuery);
+    </script>
+
+    <script type="text/javascript">
+      var promoCode = "";
+      var bg1 = "aanda.jpg";
+      var bg2 = "r and s.jpg";
+      var bg3 = "tanss.jpg";
+      var bg4 = "sandm.jpg";
+      var bg5 = "vanda.jpg";
+
+      var JsonObject, bgArr;
+
+      // JS array
+      var bgArr = [bg1, bg2, bg3, bg4, bg5];
+      var json_string = JSON.stringify(bgArr);
+
+      var obj = JSON.parse(json_string);
+
+      // type
+      console.log(typeof JsonObject);
+
+      // JsonObject
+      console.log(JsonObject);
+
+      for (var i = bgArr.length - 1; i >= 0; i--) {
+        selectBG = bgArr.splice(Math.floor(Math.random() * bgArr.length), 1)[0];
+        console.log(selectBG);
+      }
+
+      if (selectBG === bg1) {
+        promoCode = "A & A";
+      } else if (selectBG === bg2) {
+        promoCode = "R & S";
+      } else if (selectBG === bg3) {
+        promoCode = "T & S";
+      } else if (selectBG === bg4) {
+        promoCode = "S & M";
+      } else if (selectBG === bg5) {
+        promoCode = "V & A";
+      } else if (bgArr.length === 0) {
+        alert("No more voucher, back to main website");
+        window.location = "https://www.google.com/";
+      }
+
+      $("#promo").wScratchPad({
+        // the size of the eraser
+        size: 50,
+        // the randomized scratch image
+        bg: selectBG,
+        // give real-time updates
+        realtime: true,
+        // The overlay image
+        fg: "Front.png",
+        // The cursor (coin) image
+        cursor:
+          'url("https://cdn.glitch.com/2c225b7b-6134-4f2b-9842-1d5d060d9cd4%2Fcoin1.png") 30 30, default',
+
+        scratchMove: function (e, percent) {
+          console.log(percent);
+          console.log(promoCode);
+
+          // Show the plain-text promo code and call-to-action when the scratch area is 50% scratched
+          if (percent > 50 && promoCode != "") {
+            $(".promo-container").show();
+            $("body").removeClass("not-selectable");
+            $(".promo-code").html("Your code is: " + promoCode);
+
+            /* var audio = new Audio('https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3');
+  audio.play(); */
+          }
+        },
+      });
+    </script>
+  </body>
+</html>
