@@ -1,0 +1,87 @@
+body{
+     width: 100%;
+    height: 100vh;
+background-size: 200%;
+    /*background: linear-gradient( #a18cd1 , #fbc2eb) ;*/
+    background-image: url('bgr.jpeg');
+    background-repeat: no-repeat;
+
+}
+
+.container {
+     width: 500px;
+     height: 300px;
+     margin: 50px auto;
+     text-align: center;
+   
+}
+
+.glass{
+    background: linear-gradient(135deg , rgba(255,255,255,0.1), rgba(255,255,255,0));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,1.18);
+    box-shadow: 0 8px 32px 0 rgba(255,255,255,0.37);
+}
+
+.container p{
+  color: white;
+  padding: 5px;
+}
+
+.clk {
+  background-color: yellow;
+  border: 2px solid black;
+  color: green;
+  padding: 5px 10px;
+  text-align: center;
+  display: inline-block;
+  font-size: 20px;
+  margin: 10px 30px;
+  cursor: pointer;
+  text-decoration:none;
+  border-radius: 12px 13px 12px 12px;
+}
+
+.hello h1{
+    color: aliceblue;
+    font-size: 15px;
+    text-align: center;
+}
+
+.hello h2{
+    font-size:  20px;
+    color: aqua;
+    text-align: center;
+}
+
+img{
+ float: left;
+ position: relative;
+ bottom: 250px;
+ left: 100px;
+ 
+}
+
+
+/* Declare a media query for screens less than 768px wide */
+@media (max-width: 580px) {
+    /* Resize the container to 100% width */
+    .container {
+      width: 530px;
+      height: 423px;
+
+    }
+    .glass{
+      width: 290px;
+      height: 287px;
+    }
+
+  
+    /* Resize the images to 100% width */
+    img {
+      width: 100%;
+    }
+  }
+    
